@@ -1,4 +1,4 @@
-/// Copyright (c) 2021 Razeware LLC
+/// Copyright (c) 2022 Razeware LLC
 /// 
 /// Permission is hereby granted, free of charge, to any person obtaining a copy
 /// of this software and associated documentation files (the "Software"), to deal
@@ -30,9 +30,29 @@
 /// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 /// THE SOFTWARE.
 
-enum APIConstants {
-  static let host = "api.petfinder.com"
-  static let grantType = "client_credentials"
-  static let clientId = "W7k9pUSNHrZaSyPKqxIj1bNkQGyVYfZs65jgKYrGja2yBRJtey"
-  static let clientSecret = "rnE33rqz9MLuBQPZjd860JyryzG9sc205iVknq5p"
+import Foundation
+
+enum AuthTokenRequest: RequestProtocol {
+
+  case auth
+
+  var path: String {
+    "/v2/oauth2/token"
+  }
+
+  var params: [String: Any] {
+    [
+      "grant_type": APIConstants.grantType,
+      "client_id": APIConstants.clientId,
+      "client_secret": APIConstants.clientSecret
+    ]
+  }
+
+  var addAuthorizationToken: Bool {
+    false
+  }
+  
+  var requestType: RequestType {
+    .POST
+  }
 }

@@ -36,16 +36,49 @@ struct AnimalsNearYouView: View {
   @State var animals: [Animal] = []
   @State var isLoading = true
 
+  private let requestManager = RequestManager()
+
   var body: some View {
     NavigationView {
-      Text("TODO: Animals Near You View")
-        .navigationTitle("Animals near you")
+      // 1
+      List {
+        ForEach(animals) { animal in
+          AnimalRow(animal: animal)
+        }
+      }
+      // 2
+      .task {
+        await fetchAnimals()
+      }
+      .listStyle(.plain)
+      .navigationTitle("Animals near you")
+      // 3
+      .overlay {
+        if isLoading {
+          ProgressView("Finding Animals near you...")
+        }
+      }
     }.navigationViewStyle(StackNavigationViewStyle())
   }
 
   @MainActor
   func stopLoading() async {
     isLoading = false
+  }
+
+  func fetchAnimals() async {
+    do {
+      // 1
+      let animalsContainer: AnimalsContainer =
+        try await requestManager.perform(AnimalsRequest.getAnimalsWith(
+          page: 1,
+          latitude: nil,
+          longitude: nil))
+      // 2
+      self.animals = animalsContainer.animals
+      // 3
+      await stopLoading()
+    } catch {}
   }
 }
 

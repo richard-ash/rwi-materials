@@ -1,4 +1,4 @@
-/// Copyright (c) 2021 Razeware LLC
+/// Copyright (c) 2022 Razeware LLC
 /// 
 /// Permission is hereby granted, free of charge, to any person obtaining a copy
 /// of this software and associated documentation files (the "Software"), to deal
@@ -30,9 +30,54 @@
 /// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 /// THE SOFTWARE.
 
-enum APIConstants {
-  static let host = "api.petfinder.com"
-  static let grantType = "client_credentials"
-  static let clientId = "W7k9pUSNHrZaSyPKqxIj1bNkQGyVYfZs65jgKYrGja2yBRJtey"
-  static let clientSecret = "rnE33rqz9MLuBQPZjd860JyryzG9sc205iVknq5p"
+import XCTest
+@testable import PetSave
+
+class RequestManagerTests: XCTestCase {
+  private var requestManager: RequestManagerProtocol?
+
+  override func setUp() {
+    super.setUp()
+    // 1
+    guard let userDefaults = UserDefaults(suiteName: #file) else {
+      return
+    }
+
+    userDefaults.removePersistentDomain(forName: #file)
+
+    // 2
+    requestManager = RequestManager(
+      apiManager: APIManagerMock(),
+      accessTokenManager: AccessTokenManager(userDefaults: userDefaults)
+    )
+  }
+
+  func testRequestAnimals() async throws {
+    // 1
+    guard let container: AnimalsContainer =
+      try await requestManager?.perform(
+        AnimalsRequestMock.getAnimals) else {
+        XCTFail("Didn't get data from the request manager")
+        return
+      }
+
+    let animals = container.animals
+
+    // 2
+    let first = animals.first
+    let last = animals.last
+
+    // 3
+    XCTAssertEqual(first?.name, "Kiki")
+    XCTAssertEqual(first?.age.rawValue, "Adult")
+    XCTAssertEqual(first?.gender.rawValue, "Female")
+    XCTAssertEqual(first?.size.rawValue, "Medium")
+    XCTAssertEqual(first?.coat?.rawValue, "Short")
+
+    XCTAssertEqual(last?.name, "Midnight")
+    XCTAssertEqual(last?.age.rawValue, "Adult")
+    XCTAssertEqual(last?.gender.rawValue, "Female")
+    XCTAssertEqual(last?.size.rawValue, "Large")
+    XCTAssertEqual(last?.coat, nil)
+  }
 }

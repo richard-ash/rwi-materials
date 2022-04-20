@@ -1,4 +1,4 @@
-/// Copyright (c) 2021 Razeware LLC
+/// Copyright (c) 2022 Razeware LLC
 /// 
 /// Permission is hereby granted, free of charge, to any person obtaining a copy
 /// of this software and associated documentation files (the "Software"), to deal
@@ -30,9 +30,49 @@
 /// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 /// THE SOFTWARE.
 
-enum APIConstants {
-  static let host = "api.petfinder.com"
-  static let grantType = "client_credentials"
-  static let clientId = "W7k9pUSNHrZaSyPKqxIj1bNkQGyVYfZs65jgKYrGja2yBRJtey"
-  static let clientSecret = "rnE33rqz9MLuBQPZjd860JyryzG9sc205iVknq5p"
+import Foundation
+
+enum AnimalsRequest: RequestProtocol {
+  case getAnimalsWith(
+    page: Int, latitude: Double?, longitude: Double?)
+  case getAnimalsBy(name: String, age: String?, type: String?)
+  // 2
+  var path: String {
+    "/v2/animals"
+  }
+  // 3
+  var urlParams: [String: String?] {
+    switch self {
+    case let .getAnimalsWith(page, latitude, longitude):
+      var params = ["page": String(page)]
+      if let latitude = latitude {
+        params["latitude"] = String(latitude)
+      }
+
+      if let longitude = longitude {
+        params["longitude"] = String(longitude)
+      }
+      params["sort"] = "random"
+      return params
+
+    case let .getAnimalsBy(name, age, type):
+      var params: [String: String] = [:]
+      if !name.isEmpty {
+        params["name"] = name
+      }
+
+      if let age = age {
+        params["age"] = age
+      }
+
+      if let type = type {
+        params["type"] = type
+      }
+      return params
+    }
+  }
+  // 4
+  var requestType: RequestType {
+    .GET
+  }
 }

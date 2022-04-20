@@ -1,4 +1,4 @@
-/// Copyright (c) 2021 Razeware LLC
+/// Copyright (c) 2022 Razeware LLC
 /// 
 /// Permission is hereby granted, free of charge, to any person obtaining a copy
 /// of this software and associated documentation files (the "Software"), to deal
@@ -30,9 +30,28 @@
 /// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 /// THE SOFTWARE.
 
-enum APIConstants {
-  static let host = "api.petfinder.com"
-  static let grantType = "client_credentials"
-  static let clientId = "W7k9pUSNHrZaSyPKqxIj1bNkQGyVYfZs65jgKYrGja2yBRJtey"
-  static let clientSecret = "rnE33rqz9MLuBQPZjd860JyryzG9sc205iVknq5p"
+import Foundation
+@testable import PetSave
+
+enum AccessTokenTestHelper {
+  // 1
+  static func randomString() -> String {
+    let letters = "abcdefghijklmnopqrstuvwxyz"
+    return String(letters.shuffled().prefix(8))
+  }
+  // 2
+  static func randomAPIToken() -> APIToken {
+    return APIToken(tokenType: "Bearer", expiresIn: 10,
+      accessToken: AccessTokenTestHelper.randomString())
+  }
+  // 3
+  static func generateValidToken() -> String {
+    """
+    {
+      "token_type": "Bearer",
+      "expires_in": 10,
+      "access_token": \"\(randomString())\"
+    }
+    """
+  }
 }

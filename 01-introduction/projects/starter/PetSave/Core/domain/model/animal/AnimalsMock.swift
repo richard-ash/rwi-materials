@@ -1,4 +1,4 @@
-/// Copyright (c) 2021 Razeware LLC
+/// Copyright (c) 2022 Razeware LLC
 /// 
 /// Permission is hereby granted, free of charge, to any person obtaining a copy
 /// of this software and associated documentation files (the "Software"), to deal
@@ -30,9 +30,23 @@
 /// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 /// THE SOFTWARE.
 
-enum APIConstants {
-  static let host = "api.petfinder.com"
-  static let grantType = "client_credentials"
-  static let clientId = "W7k9pUSNHrZaSyPKqxIj1bNkQGyVYfZs65jgKYrGja2yBRJtey"
-  static let clientSecret = "rnE33rqz9MLuBQPZjd860JyryzG9sc205iVknq5p"
+import Foundation
+
+private struct AnimalsMock: Codable {
+  let animals: [Animal]
+}
+
+private func loadAnimals() -> [Animal] {
+  guard let url = Bundle.main.url(
+    forResource: "AnimalsMock",
+    withExtension: "json"
+  ), let data = try? Data(contentsOf: url) else { return [] }
+  let decoder = JSONDecoder()
+  decoder.keyDecodingStrategy = .convertFromSnakeCase
+  let jsonMock = try? decoder.decode(AnimalsMock.self, from: data)
+  return jsonMock?.animals ?? []
+}
+
+extension Animal {
+  static let mock = loadAnimals()
 }
